@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZoomAutomóveis - Stand Automóvel</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f2f4f7;color:#333}
+header{background:#0d1b2a;color:white;padding:30px;display:flex;align-items:center;justify-content:center;gap:15px;flex-wrap:wrap;text-align:center}
+header img{height:80px;border-radius:8px}
+header div{display:flex;flex-direction:column;align-items:center}
+nav{background:#1b263b;padding:12px;text-align:center}
+nav a{color:white;margin:0 15px;text-decoration:none;font-weight:bold}
+nav a:hover{opacity:0.8}
+.hero{background:url('https://images.unsplash.com/photo-1503376780353-7e6692767b70') center/cover no-repeat;height:320px;display:flex;align-items:center;justify-content:center;color:white;text-align:center}
+.hero h1{background:rgba(0,0,0,0.5);padding:20px;border-radius:10px}
+.container{max-width:1200px;margin:auto;padding:20px}
+.section-title{text-align:center;margin:40px 0}
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;justify-content:center}
+.filters input,.filters select{padding:10px;border-radius:6px;border:1px solid #ccc}
+.cars{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.card{background:white;border-radius:10px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.1)}
+.card img{width:100%;height:170px;object-fit:cover}
+.card-content{padding:15px}
+.price{font-size:22px;font-weight:bold;margin-top:8px}
+.button{display:inline-block;margin-top:10px;padding:10px 15px;background:#1b263b;color:white;text-decoration:none;border-radius:6px;cursor:pointer}
+.button:hover{background:#0d1b2a}
+.admin{background:white;padding:20px;border-radius:10px;margin-top:40px;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
+.admin input{width:100%;padding:10px;margin:6px 0;border:1px solid #ccc;border-radius:6px}
+.login{max-width:400px;margin:auto;background:white;padding:20px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
+footer{background:#0d1b2a;color:white;text-align:center;padding:25px;margin-top:50px}
+.whatsapp{position:fixed;bottom:20px;right:20px;background:#25D366;color:white;padding:15px;border-radius:50%;font-size:20px;text-decoration:none}
+@media (max-width:768px){header{flex-direction:column} header img{margin-bottom:10px}}
+</style>
+</head>
+<body>
+
+<header>
+<img src="logo.png" alt="ZoomAutomóveis">
+<div>
+<h1>ZoomAutomóveis</h1>
+<p>Carros usados e seminovos com garantia</p>
+</div>
+</header>
+
+<nav>
+<a href="#inicio">Início</a>
+<a href="#stock">Carros</a>
+<a href="#adminArea">Admin</a>
+<a href="#contacto">Contacto</a>
+</nav>
+
+<section class="hero" id="inicio">
+<h1>Encontre o seu próximo carro</h1>
+</section>
+
+<div class="container">
+<h2 class="section-title" id="stock">Carros Disponíveis</h2>
+<div class="filters">
+<input id="search" placeholder="Pesquisar marca ou modelo">
+<select id="fuelFilter">
+<option value="">Combustível</option>
+<option>Diesel</option>
+<option>Gasolina</option>
+<option>Híbrido</option>
+<option>Elétrico</option>
+</select>
+<button class="button" onclick="renderCars()">Filtrar</button>
+</div>
+<div class="cars" id="carList"></div>
+
+<div id="adminArea" style="margin-top:50px">
+<div class="login" id="loginBox">
+<h3>Login administrador</h3>
+<input id="user" placeholder="Utilizador">
+<input id="pass" type="password" placeholder="Senha">
+<button class="button" onclick="login()">Entrar</button>
+</div>
+<div class="admin" id="adminPanel" style="display:none">
+<h2>Painel de administração</h2>
+<input id="marca" placeholder="Marca e modelo">
+<input id="ano" placeholder="Ano">
+<input id="km" placeholder="Quilómetros">
+<input id="combustivel" placeholder="Combustível">
+<input id="preco" placeholder="Preço">
+<input id="foto" placeholder="Link da foto">
+<button class="button" onclick="addCar()">Adicionar carro</button>
+</div>
+</div>
+
+<h2 class="section-title" id="contacto">Contacto</h2>
+<p style="text-align:center">
+ZoomAutomóveis<br>
+Porto - Portugal<br>
+Telefone: +351 900000000<br>
+Email: zoomautomoveis@email.com
+</p>
+</div>
+
+<footer>
+<p>© 2026 ZoomAutomóveis - Todos os direitos reservados</p>
+</footer>
+
+<a class="whatsapp" href="https://wa.me/351900000000" target="_blank">💬</a>
+
+<script>
+let cars = JSON.parse(localStorage.getItem('cars')) || [];
+
+function saveCars(){
+  localStorage.setItem('cars', JSON.stringify(cars));
+}
+
+function renderCars(){
+  const list = document.getElementById('carList');
+  list.innerHTML='';
+  const search = document.getElementById('search').value.toLowerCase();
+  const fuel = document.getElementById('fuelFilter').value;
+
+  cars.filter(car=>car.marca.toLowerCase().includes(search))
+      .filter(car=>fuel==='' || car.combustivel===fuel)
+      .forEach((car,index)=>{
+        list.innerHTML += `
+        <div class="card">
+          <img src="${car.foto}">
+          <div class="card-content">
+            <h3>${car.marca}</h3>
+            <p>${car.ano} • ${car.combustivel} • ${car.km} km</p>
+            <div class="price">${car.preco}€</div>
+            <a class="button" href="https://wa.me/351900000000" target="_blank">Contactar</a>
+            <button class="button" style="background:#c0392b;margin-top:5px;" onclick="removeCar(${index})">Remover</button>
+            <button class="button" style="background:#f39c12;margin-top:5px;" onclick="editCar(${index})">Editar</button>
+          </div>
+        </div>`;
+      });
+}
+
+function addCar(){
+  const car={
+    marca:marca.value,
+    ano:ano.value,
+    km:km.value,
+    combustivel:combustivel.value,
+    preco:preco.value,
+    foto:foto.value
+  };
+  cars.push(car);
+  saveCars();
+  renderCars();
+  alert('Carro adicionado com sucesso');
+}
+
+function removeCar(index){
+  if(confirm('Tem certeza que deseja remover este carro?')){
+    cars.splice(index,1);
+    saveCars();
+    renderCars();
+  }
+}
+
+function editCar(index){
+  const car = cars[index];
+  marca.value = car.marca;
+  ano.value = car.ano;
+  km.value = car.km;
+  combustivel.value = car.combustivel;
+  preco.value = car.preco;
+  foto.value = car.foto;
+  removeCar(index);
+  window.scrollTo({top:document.getElementById('adminArea').offsetTop, behavior:'smooth'});
+  alert('Edite os campos e clique em Adicionar para salvar as alterações');
+}
+
+function login(){
+  if(user.value==='admin' && pass.value==='1234'){
+    loginBox.style.display='none';
+    adminPanel.style.display='block';
+  }else{
+    alert('Login inválido');
+  }
+}
+
+renderCars();
+</script>
+
+</body>
+</html>
+
+                                                                                                                                                                                                                                                                                                                                                                                
